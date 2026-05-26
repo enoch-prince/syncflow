@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "syncflow-workspace",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Monorepo for SyncFlow packages",
   "packageManager": "pnpm@8.9.0",
   "workspaces": [
