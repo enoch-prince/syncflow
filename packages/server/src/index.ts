@@ -7,9 +7,7 @@
 
 import express, { Request, Response } from 'express';
 import cors from 'cors';
-import { MongoSyncAdapter } from './mongo-adapter';
-import { PostgresSyncAdapter } from './postgres-adapter';
-import { Operation } from '../src/database';
+import type { Operation } from '@syncflow/core';
 
 export interface ServerConfig {
   port: number;
@@ -21,7 +19,7 @@ export interface ServerConfig {
 
 export class SyncServer {
   private app: express.Application;
-  private adapter: MongoSyncAdapter | PostgresSyncAdapter;
+  private adapter: any;
   private config: ServerConfig;
 
   constructor(config: ServerConfig) {
@@ -29,24 +27,34 @@ export class SyncServer {
     this.app = express();
     this.setupMiddleware();
     this.setupRoutes();
+  }
 
-    // Initialize appropriate adapter
-    if (config.adapter === 'mongodb') {
-      if (!config.mongoUri || !config.mongoDbName) {
+  private async initializeAdapter(): Promise<void> {
+    if (this.adapter) {
+      return;
+    }
+
+    if (this.config.adapter === 'mongodb') {
+      if (!this.config.mongoUri || !this.config.mongoDbName) {
         throw new Error('MongoDB URI and database name required');
       }
+
+      const { MongoSyncAdapter } = await import('@syncflow/mongodb');
       this.adapter = new MongoSyncAdapter({
-        uri: config.mongoUri,
-        dbName: config.mongoDbName,
+        uri: this.config.mongoUri,
+        dbName: this.config.mongoDbName,
       });
-    } else {
-      if (!config.postgresConnectionString) {
-        throw new Error('PostgreSQL connection string required');
-      }
-      this.adapter = new PostgresSyncAdapter({
-        connectionString: config.postgresConnectionString,
-      });
+      return;
     }
+
+    if (!this.config.postgresConnectionString) {
+      throw new Error('PostgreSQL connection string required');
+    }
+
+    const { PostgresSyncAdapter } = await import('@syncflow/postgres');
+    this.adapter = new PostgresSyncAdapter({
+      connectionString: this.config.postgresConnectionString,
+    });
   }
 
   /**
@@ -184,11 +192,14 @@ export class SyncServer {
    */
   async start(): Promise<void> {
     try {
-      // Connect to database
-      if (this.adapter instanceof MongoSyncAdapter) {
+      await this.initializeAdapter();
+
+      if (typeof this.adapter.connect === 'function') {
         await this.adapter.connect();
+      } else if (typeof this.adapter.initialize === 'function') {
+        await this.adapter.initialize();
       } else {
-        await (this.adapter as PostgresSyncAdapter).initialize();
+        throw new Error('Adapter does not support initialization');
       }
 
       // Start HTTP server

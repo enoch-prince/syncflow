@@ -6,8 +6,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const distEsmDir = path.join(__dirname, '..', 'dist-esm');
-const distDir = path.join(__dirname, '..', 'dist');
+const distEsmDir = path.resolve(process.cwd(), process.argv[2] || path.join(__dirname, '..', 'dist-esm'));
+const distDir = path.resolve(process.cwd(), process.argv[3] || path.join(__dirname, '..', 'dist'));
 
 function processDirectory(dir) {
   const files = fs.readdirSync(dir);

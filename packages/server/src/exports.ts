@@ -1,7 +1,7 @@
 /**
  * Server-side exports for local-first-db
  * 
- * Import from '@yourname/local-first-db/server'
+ * Import from '@syncflow/server'
  * 
  * @packageDocumentation
  */
@@ -9,18 +9,12 @@
 export { SyncServer } from './index';
 export type { ServerConfig } from './index';
 
-export { MongoSyncAdapter } from './mongo-adapter';
-export type { MongoSyncAdapterOptions } from './mongo-adapter';
-
-export { PostgresSyncAdapter } from './postgres-adapter';
-export type { PostgresSyncAdapterOptions } from './postgres-adapter';
-
 /**
  * Quick start server creation
  * 
  * @example
  * ```typescript
- * import { createServer } from '@yourname/local-first-db/server';
+ * import { createServer } from '@syncflow/server';
  * 
  * const server = await createServer({
  *   port: 3000,

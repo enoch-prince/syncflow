@@ -1,0 +1,28 @@
+{
+  "name": "@syncflow/server",
+  "version": "0.3.1",
+  "description": "SyncFlow server package",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
+    "build": "pnpm run build:cjs && pnpm run build:esm",
+    "build:cjs": "tsc --project tsconfig.json --module commonjs --outDir dist",
+    "build:esm": "tsc --project tsconfig.json --module esnext --outDir dist-esm && node ../../scripts/build-esm.js dist-esm dist",
+    "test": "echo \"Tests coming soon\""
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "@syncflow/core": "workspace:^"
+  }
+}

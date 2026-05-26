@@ -1,5 +1,5 @@
 /**
- * @yourname/local-first-db
+ * @syncflow/core
  * 
  * Local-first database with event sourcing and multi-database sync.
  * 
@@ -17,12 +17,14 @@ export type {
 
 // Sync engine exports
 export { SyncEngine } from './sync-engine';
+export { compareVectorClocks } from './vector-clock';
 import type { SyncEngine as SyncEngineType } from './sync-engine';
 export type {
   SyncOptions,
   SyncProgress,
   SyncResult,
 } from './sync-engine';
+export type { ClockRelation } from './vector-clock';
 
 // Version (generated from package.json)
 export { VERSION } from './version';
@@ -32,7 +34,7 @@ export { VERSION } from './version';
  * 
  * @example
  * ```typescript
- * import { createDatabase } from '@yourname/local-first-db';
+ * import { createDatabase } from '@syncflow/core';
  * 
  * const db = await createDatabase({
  *   name: 'my-app',

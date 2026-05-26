@@ -1,8 +1,14 @@
 const fs = require('fs');
 const path = require('path');
 
-const pkgPath = path.join(__dirname, '..', 'package.json');
-const outPath = path.join(__dirname, '..', 'src', 'version.ts');
+const fs = require('fs');
+const path = require('path');
+
+const targetDir = process.argv[2]
+  ? path.resolve(process.cwd(), process.argv[2])
+  : path.join(__dirname, '..');
+const pkgPath = path.join(targetDir, 'package.json');
+const outPath = path.join(targetDir, 'src', 'version.ts');
 
 function main() {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));

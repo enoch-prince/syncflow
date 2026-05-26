@@ -1,0 +1,35 @@
+{
+  "name": "@syncflow/core",
+  "version": "0.3.1",
+  "description": "Core client library for SyncFlow",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
+    "build": "pnpm run build:cjs && pnpm run build:esm",
+    "build:cjs": "tsc --project tsconfig.json --module commonjs --outDir dist",
+    "build:esm": "tsc --project tsconfig.json --module esnext --outDir dist-esm && node ../../scripts/build-esm.js dist-esm dist",
+    "version": "node ../../scripts/update-version.js . && git add src/version.ts",
+    "test": "echo \"Tests coming soon\""
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  },
+  "peerDependencies": {
+    "wa-sqlite": "^1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "wa-sqlite": {
+      "optional": true
+    }
+  }
+}
