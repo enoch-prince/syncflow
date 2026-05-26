@@ -1,0 +1,39 @@
+# Source files
+src/
+server/
+examples/
+
+# TypeScript
+tsconfig.json
+tsconfig.*.json
+*.tsbuildinfo
+
+# Tests
+__tests__/
+*.test.ts
+*.spec.ts
+coverage/
+
+# Development
+.env
+.env.*
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+*.sw*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts (keep dist/)
+dist-esm/
+
+# Git
+.git/
+.gitignore
+
+# CI
+.github/

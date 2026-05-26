@@ -1,0 +1,96 @@
+{
+  "name": "@syncflow/core",
+  "version": "1.0.0",
+  "description": "Local-first database with event sourcing and vector clock synchronization. Flow seamlessly between local and cloud.",
+  "keywords": [
+    "local-first",
+    "offline-first",
+    "database",
+    "sync",
+    "event-sourcing",
+    "vector-clocks",
+    "crdt",
+    "indexeddb",
+    "sqlite",
+    "wasm",
+    "real-time",
+    "collaboration",
+    "syncflow"
+  ],
+  "author": "Your Name <your.email@example.com>",
+  "license": "MIT",
+  "homepage": "https://syncflow.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/syncflow.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/syncflow/issues"
+  },
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/server/index.mjs",
+      "require": "./dist/server/index.js",
+      "types": "./dist/server/index.d.ts"
+    },
+    "./adapters/mongodb": {
+      "import": "./dist/server/mongo-adapter.mjs",
+      "require": "./dist/server/mongo-adapter.js",
+      "types": "./dist/server/mongo-adapter.d.ts"
+    },
+    "./adapters/postgres": {
+      "import": "./dist/server/postgres-adapter.mjs",
+      "require": "./dist/server/postgres-adapter.js",
+      "types": "./dist/server/postgres-adapter.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "clean": "rm -rf dist dist-esm",
+    "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
+    "build:cjs": "tsc --module commonjs --outDir dist",
+    "build:esm": "tsc --module esnext --outDir dist-esm && node scripts/build-esm.js",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Tests coming soon\"",
+    "release": "npm run build && npm publish --access public"
+  },
+  "peerDependencies": {
+    "wa-sqlite": "^0.9.9"
+  },
+  "peerDependenciesMeta": {
+    "wa-sqlite": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "@types/uuid": "^9.0.7",
+    "typescript": "^5.3.3"
+  },
+  "optionalDependencies": {
+    "mongodb": "^6.3.0",
+    "pg": "^8.11.3",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
