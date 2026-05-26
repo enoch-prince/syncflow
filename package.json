@@ -1,6 +1,6 @@
 {
   "name": "@syncflow/core",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Local-first database with event sourcing and vector clock synchronization. Flow seamlessly between local and cloud.",
   "keywords": [
     "local-first",
@@ -22,19 +22,19 @@
   "homepage": "https://syncflow.dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/syncflow.git"
+    "url": "https://github.com/enoch-prince/syncflow.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/syncflow/issues"
+    "url": "https://github.com/enoch-prince/syncflow/issues"
   },
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "module": "dist/src/index.mjs",
+  "types": "dist/src/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/src/index.mjs",
+      "require": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
     },
     "./server": {
       "import": "./dist/server/index.mjs",
