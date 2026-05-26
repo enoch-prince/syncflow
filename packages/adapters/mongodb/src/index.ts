@@ -6,8 +6,8 @@
  */
 
 import { MongoClient, Db, Collection, ChangeStream } from 'mongodb';
-import { Operation } from '../src/database';
-import { compareVectorClocks } from '../src/vector-clock';
+import type { Operation } from '@syncflow/core';
+import { compareVectorClocks } from '@syncflow/core';
 
 export interface MongoSyncAdapterOptions {
   uri: string;

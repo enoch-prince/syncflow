@@ -6,8 +6,8 @@
  */
 
 import { Pool, PoolClient } from 'pg';
-import { Operation } from '../src/database';
-import { compareVectorClocks } from '../src/vector-clock';
+import type { Operation } from '@syncflow/core';
+import { compareVectorClocks } from '@syncflow/core';
 
 export interface PostgresSyncAdapterOptions {
   connectionString: string;

@@ -6,7 +6,7 @@
  * offline support.
  */
 
-import { LocalFirstDB, Operation } from './database';
+import { LocalFirstDB, Operation } from './database.js';
 
 export interface SyncOptions {
   serverUrl: string;
