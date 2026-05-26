@@ -1,6 +1,6 @@
 {
   "name": "@syncflow/core",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Local-first database with event sourcing and vector clock synchronization. Flow seamlessly between local and cloud.",
   "keywords": [
     "local-first",
