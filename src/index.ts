@@ -25,7 +25,7 @@ export type {
 } from './sync-engine';
 
 // Version
-export const VERSION = '1.0.0';
+export const VERSION = '0.3.0';
 
 /**
  * Initialize a new local-first database instance

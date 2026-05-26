@@ -218,7 +218,7 @@ export class SyncServer {
 }
 
 // CLI entry point
-if (require.main === module) {
+if (typeof require !== 'undefined' && (require as any).main === module) {
   const config: ServerConfig = {
     port: parseInt(process.env.PORT || '3000', 10),
     adapter: (process.env.ADAPTER as 'mongodb' | 'postgres') || 'mongodb',
