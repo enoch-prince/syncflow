@@ -6,8 +6,8 @@
  * @packageDocumentation
  */
 
-export { SyncServer } from './index';
-export type { ServerConfig } from './index';
+export { SyncServer } from './index.js';
+export type { ServerConfig } from './index.js';
 
 /**
  * Quick start server creation
@@ -33,7 +33,7 @@ export async function createServer(config: {
   mongoDbName?: string;
   postgresConnectionString?: string;
 }) {
-  const { SyncServer } = await import('./index');
+  const { SyncServer } = await import('./index.js');
   const server = new SyncServer(config as any);
   return server;
 }

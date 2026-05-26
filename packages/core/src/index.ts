@@ -7,27 +7,27 @@
  */
 
 // Core database exports
-export { LocalFirstDB } from './database';
+export { LocalFirstDB } from './database.js';
 export type {
   Document,
   Operation,
   OperationType,
   VectorClock,
-} from './database';
+} from './database.js';
 
 // Sync engine exports
-export { SyncEngine } from './sync-engine';
-export { compareVectorClocks } from './vector-clock';
-import type { SyncEngine as SyncEngineType } from './sync-engine';
+export { SyncEngine } from './sync-engine.js';
+export { compareVectorClocks } from './vector-clock.js';
+import type { SyncEngine as SyncEngineType } from './sync-engine.js';
 export type {
   SyncOptions,
   SyncProgress,
   SyncResult,
-} from './sync-engine';
-export type { ClockRelation } from './vector-clock';
+} from './sync-engine.js';
+export type { ClockRelation } from './vector-clock.js';
 
 // Version (generated from package.json)
-export { VERSION } from './version';
+export { VERSION } from './version.js';
 
 /**
  * Initialize a new local-first database instance
@@ -49,8 +49,8 @@ export async function createDatabase(options: {
   serverUrl?: string;
   syncInterval?: number;
 }) {
-  const { LocalFirstDB } = await import('./database');
-  const { SyncEngine } = await import('./sync-engine');
+  const { LocalFirstDB } = await import('./database.js');
+  const { SyncEngine } = await import('./sync-engine.js');
 
   const db = new LocalFirstDB(options.name);
   
@@ -72,7 +72,7 @@ export async function createDatabase(options: {
     });
 
     if (options.syncInterval) {
-      sync.startContinuousSync(options.syncInterval);
+      sync?.startContinuousSync(options.syncInterval);
     }
   }
 

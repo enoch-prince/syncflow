@@ -6,7 +6,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { compareVectorClocks } from './vector-clock';
+import { compareVectorClocks } from './vector-clock.js';
 
 // Operation types
 export type OperationType = 'insert' | 'update' | 'delete' | 'batch';

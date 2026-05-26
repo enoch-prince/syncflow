@@ -16,13 +16,29 @@
   "scripts": {
     "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "build": "pnpm run build:cjs && pnpm run build:esm",
-    "build:cjs": "tsc --project tsconfig.json --module commonjs --outDir dist",
-    "build:esm": "tsc --project tsconfig.json --module esnext --outDir dist-esm && node ../../scripts/build-esm.js dist-esm dist",
+    "build:cjs": "tsc --project tsconfig.json --module commonjs --moduleResolution node --outDir dist",
+    "build:esm": "tsc --project tsconfig.json --module Node16 --moduleResolution node16 --outDir dist-esm && node ../../scripts/build-esm.js dist-esm dist",
     "test": "echo \"Tests coming soon\""
   },
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
     "@syncflow/core": "workspace:^"
+  },
+  "peerDependencies": {
+    "@syncflow/mongodb": "*",
+    "@syncflow/postgres": "*"
+  },
+  "peerDependenciesMeta": {
+    "@syncflow/mongodb": {
+      "optional": true
+    },
+    "@syncflow/postgres": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@syncflow/mongodb": "workspace:^",
+    "@syncflow/postgres": "workspace:^"
   }
 }
