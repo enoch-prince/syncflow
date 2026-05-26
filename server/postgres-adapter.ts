@@ -7,6 +7,7 @@
 
 import { Pool, PoolClient } from 'pg';
 import { Operation } from '../src/database';
+import { compareVectorClocks } from '../src/vector-clock';
 
 export interface PostgresSyncAdapterOptions {
   connectionString: string;
@@ -166,21 +167,25 @@ export class PostgresSyncAdapter {
           [op.collection, op.docId]
         );
 
-        let hasConflict = false;
-
         if (docState.rows.length > 0) {
-          const currentClock = docState.rows[0].vector_clock;
-          hasConflict = this.detectConflict(currentClock, op.vectorClock);
-        }
-
-        if (hasConflict) {
-          conflicts.push({
-            ...op,
-            data: docState.rows[0].data,
-            vectorClock: docState.rows[0].vector_clock,
-          });
-          await client.query('ROLLBACK');
-          continue;
+          const relation = compareVectorClocks(
+            op.vectorClock,
+            docState.rows[0].vector_clock
+          );
+          // 'before'     → op is older than server state (stale write)
+          // 'concurrent' → real conflict; both sides have unique changes
+          // Either way: reject and return server's version so the client can
+          // update its local state and clock.
+          if (relation === 'before' || relation === 'concurrent') {
+            conflicts.push({
+              ...op,
+              data: docState.rows[0].data,
+              vectorClock: docState.rows[0].vector_clock,
+            });
+            await client.query('ROLLBACK');
+            continue;
+          }
+          // 'after' or 'equal' → op is causally newer (or identical); accept.
         }
 
         // Insert operation
@@ -391,28 +396,6 @@ export class PostgresSyncAdapter {
   }
 
   /**
-   * Detect conflicts using vector clocks
-   */
-  private detectConflict(
-    clock1: Record<string, number>,
-    clock2: Record<string, number>
-  ): boolean {
-    const allKeys = new Set([...Object.keys(clock1), ...Object.keys(clock2)]);
-    let clock1Newer = false;
-    let clock2Newer = false;
-
-    for (const key of allKeys) {
-      const val1 = clock1[key] || 0;
-      const val2 = clock2[key] || 0;
-
-      if (val1 > val2) clock1Newer = true;
-      if (val2 > val1) clock2Newer = true;
-    }
-
-    return clock1Newer && clock2Newer;
-  }
-
-  /**
    * Map PostgreSQL row to Operation
    */
   private mapFromPostgres(row: any): Operation {
@@ -452,7 +435,10 @@ export class PostgresSyncAdapter {
   }
 
   /**
-   * Compact operations (remove old synced operations)
+   * Compact operations (remove operations older than the cutoff).
+   *
+   * Note: filters by age only. The `synced` flag is a client-side concept
+   * that the server never sets, so filtering on it would match zero rows.
    */
   async compact(olderThanDays: number = 30): Promise<number> {
     const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
@@ -460,7 +446,7 @@ export class PostgresSyncAdapter {
     const result = await this.pool.query(
       `
       DELETE FROM ${this.schema}.operations
-      WHERE timestamp < $1 AND synced = TRUE
+      WHERE timestamp < $1
       `,
       [cutoff]
     );

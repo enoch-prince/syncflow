@@ -6,6 +6,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
+import { compareVectorClocks } from './vector-clock';
 
 // Operation types
 export type OperationType = 'insert' | 'update' | 'delete' | 'batch';
@@ -72,7 +73,9 @@ export class LocalFirstDB {
       CREATE INDEX IF NOT EXISTS idx_ops_synced ON operations(synced, timestamp);
       CREATE INDEX IF NOT EXISTS idx_ops_collection ON operations(collection, doc_id);
 
-      -- Materialized view of current document state
+      -- Materialized view of current document state.
+      -- last_writer_id records the clientId of the op that last won LWW
+      -- for this row; used as a deterministic tiebreaker on timestamp ties.
       CREATE TABLE IF NOT EXISTS documents (
         id TEXT PRIMARY KEY,
         collection TEXT NOT NULL,
@@ -80,7 +83,8 @@ export class LocalFirstDB {
         rev INTEGER DEFAULT 1,
         deleted INTEGER DEFAULT 0,
         vector_clock TEXT NOT NULL,
-        updated_at INTEGER NOT NULL
+        updated_at INTEGER NOT NULL,
+        last_writer_id TEXT
       );
 
       CREATE INDEX IF NOT EXISTS idx_docs_collection ON documents(collection);
@@ -91,6 +95,15 @@ export class LocalFirstDB {
         value TEXT NOT NULL
       );
     `);
+
+    // Idempotent migration for DBs created before last_writer_id existed.
+    // SQLite has no "ADD COLUMN IF NOT EXISTS"; the ALTER throws if the
+    // column is already present, which we ignore.
+    try {
+      await this.db.exec('ALTER TABLE documents ADD COLUMN last_writer_id TEXT');
+    } catch {
+      // Column already exists — fine.
+    }
 
     console.log('✓ Database initialized');
   }
@@ -338,7 +351,7 @@ export class LocalFirstDB {
 
   private async applyOperation(op: Operation): Promise<Document> {
     const existing = await this.db.exec(
-      'SELECT data, rev, vector_clock FROM documents WHERE id = ? AND collection = ?',
+      'SELECT data, rev, deleted, vector_clock, updated_at, last_writer_id FROM documents WHERE id = ? AND collection = ?',
       [op.docId, op.collection]
     );
 
@@ -346,17 +359,45 @@ export class LocalFirstDB {
     let newRev: number;
 
     if (existing.length === 0) {
-      // New document
+      // New document — no conflict possible.
       newData = op.data || {};
       newRev = 1;
     } else {
       const current = JSON.parse(existing[0].data);
       const currentClock = JSON.parse(existing[0].vector_clock);
-      
-      // Check for conflicts using vector clocks
-      if (this.hasConcurrentChange(currentClock, op.vectorClock)) {
-        // Conflict! Use last-write-wins based on timestamp
-        console.warn(`Conflict detected for ${op.docId}, using last-write-wins`);
+      const currentTimestamp: number = existing[0].updated_at;
+      const currentWriterId: string = existing[0].last_writer_id || '';
+
+      const relation = compareVectorClocks(op.vectorClock, currentClock);
+
+      // Decide whether the incoming op should overwrite the materialized view.
+      //   'after' / 'equal'  → op is causally newer (or identical) → apply
+      //   'before'           → op is causally older → skip the view update
+      //                        (still recorded in the operations log)
+      //   'concurrent'       → real conflict → LWW with deterministic tiebreak
+      let opWins: boolean;
+      if (relation === 'before') {
+        opWins = false;
+      } else if (relation === 'concurrent') {
+        opWins =
+          op.timestamp > currentTimestamp ||
+          (op.timestamp === currentTimestamp && op.clientId > currentWriterId);
+        console.warn(
+          `LWW for ${op.docId}: op ${op.id} (${op.clientId}@${op.timestamp}) vs ` +
+          `existing (${currentWriterId}@${currentTimestamp}) → ` +
+          (opWins ? 'op wins' : 'existing wins')
+        );
+      } else {
+        opWins = true;
+      }
+
+      if (!opWins) {
+        return {
+          _id: op.docId,
+          _rev: existing[0].rev,
+          _deleted: Boolean(existing[0].deleted),
+          ...current,
+        };
       }
 
       newRev = existing[0].rev + 1;
@@ -371,14 +412,15 @@ export class LocalFirstDB {
     }
 
     await this.db.exec(`
-      INSERT INTO documents (id, collection, data, rev, deleted, vector_clock, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO documents (id, collection, data, rev, deleted, vector_clock, updated_at, last_writer_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       ON CONFLICT(id) DO UPDATE SET
         data = ?,
         rev = ?,
         deleted = ?,
         vector_clock = ?,
-        updated_at = ?
+        updated_at = ?,
+        last_writer_id = ?
     `, [
       op.docId,
       op.collection,
@@ -387,11 +429,13 @@ export class LocalFirstDB {
       op.type === 'delete' ? 1 : 0,
       JSON.stringify(op.vectorClock),
       op.timestamp,
+      op.clientId,
       JSON.stringify(newData),
       newRev,
       op.type === 'delete' ? 1 : 0,
       JSON.stringify(op.vectorClock),
       op.timestamp,
+      op.clientId,
     ]);
 
     return {
@@ -414,22 +458,6 @@ export class LocalFirstDB {
         count
       );
     }
-  }
-
-  private hasConcurrentChange(clock1: VectorClock, clock2: VectorClock): boolean {
-    const keys = new Set([...Object.keys(clock1), ...Object.keys(clock2)]);
-    let clock1Greater = false;
-    let clock2Greater = false;
-
-    for (const key of keys) {
-      const val1 = clock1[key] || 0;
-      const val2 = clock2[key] || 0;
-
-      if (val1 > val2) clock1Greater = true;
-      if (val2 > val1) clock2Greater = true;
-    }
-
-    return clock1Greater && clock2Greater;
   }
 
   private getOrCreateClientId(): string {

@@ -7,6 +7,7 @@
 
 import { MongoClient, Db, Collection, ChangeStream } from 'mongodb';
 import { Operation } from '../src/database';
+import { compareVectorClocks } from '../src/vector-clock';
 
 export interface MongoSyncAdapterOptions {
   uri: string;
@@ -104,30 +105,30 @@ export class MongoSyncAdapter {
           continue;
         }
 
-        // Check for conflicts with document state
+        // Compare vector clocks against server's current document state
         const docState = await this.documents.findOne({
           collection: op.collection,
           id: op.docId,
         });
 
-        let hasConflict = false;
-
         if (docState) {
-          // Compare vector clocks to detect concurrent changes
-          const currentClock = docState.vectorClock || {};
-          const opClock = op.vectorClock;
-
-          hasConflict = this.detectConflict(currentClock, opClock);
-        }
-
-        if (hasConflict) {
-          // Return server's version for conflict resolution
-          conflicts.push({
-            ...op,
-            data: docState?.data,
-            vectorClock: docState?.vectorClock,
-          });
-          continue;
+          const relation = compareVectorClocks(
+            op.vectorClock,
+            docState.vectorClock || {}
+          );
+          // 'before'     → op is older than server state (stale write)
+          // 'concurrent' → real conflict; both sides have unique changes
+          // Either way: reject and return server's version so the client can
+          // update its local state and clock.
+          if (relation === 'before' || relation === 'concurrent') {
+            conflicts.push({
+              ...op,
+              data: docState.data,
+              vectorClock: docState.vectorClock,
+            });
+            continue;
+          }
+          // 'after' or 'equal' → op is causally newer (or identical); accept.
         }
 
         // Store operation
@@ -258,29 +259,6 @@ export class MongoSyncAdapter {
   }
 
   /**
-   * Detect conflicts using vector clocks
-   */
-  private detectConflict(
-    clock1: Record<string, number>,
-    clock2: Record<string, number>
-  ): boolean {
-    const allKeys = new Set([...Object.keys(clock1), ...Object.keys(clock2)]);
-    let clock1Newer = false;
-    let clock2Newer = false;
-
-    for (const key of allKeys) {
-      const val1 = clock1[key] || 0;
-      const val2 = clock2[key] || 0;
-
-      if (val1 > val2) clock1Newer = true;
-      if (val2 > val1) clock2Newer = true;
-    }
-
-    // Concurrent if both have newer changes
-    return clock1Newer && clock2Newer;
-  }
-
-  /**
    * Map MongoDB document to Operation
    */
   private mapFromMongo(doc: any): Operation {
@@ -319,14 +297,16 @@ export class MongoSyncAdapter {
   }
 
   /**
-   * Compact operations (remove old synced operations)
+   * Compact operations (remove operations older than the cutoff).
+   *
+   * Note: filters by age only. The `synced` flag is a client-side concept
+   * that the server never sets, so filtering on it would match zero rows.
    */
   async compact(olderThanDays: number = 30): Promise<number> {
     const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
-    
+
     const result = await this.operations.deleteMany({
       timestamp: { $lt: cutoff },
-      synced: true,
     });
 
     console.log(`✓ Compacted ${result.deletedCount} old operations`);

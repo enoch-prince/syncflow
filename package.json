@@ -1,6 +1,6 @@
 {
   "name": "@syncflow/core",
-  "version": "0.1.0",
+  "version": "0.3.1",
   "description": "Local-first database with event sourcing and vector clock synchronization. Flow seamlessly between local and cloud.",
   "keywords": [
     "local-first",
@@ -59,11 +59,12 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "clean": "rm -rf dist dist-esm",
+    "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
     "build:cjs": "tsc --module commonjs --outDir dist",
     "build:esm": "tsc --module esnext --outDir dist-esm && node scripts/build-esm.js",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
+    "version": "node scripts/update-version.js && git add src/version.ts",
     "prepublishOnly": "npm run build",
     "test": "echo \"Tests coming soon\"",
     "release": "npm run build && npm publish --access public"
@@ -81,7 +82,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.6",
+    "@types/express": "^4.17.17",
     "@types/node": "^20.10.6",
     "@types/pg": "^8.20.0",
     "@types/uuid": "^9.0.7",
