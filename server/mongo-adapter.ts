@@ -133,7 +133,7 @@ export class MongoSyncAdapter {
         // Store operation
         await this.operations.insertOne({
           ...op,
-          _id: op.id,
+          _id: op.id as any,
           receivedAt: Date.now(),
         });
 
