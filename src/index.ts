@@ -24,8 +24,8 @@ export type {
   SyncResult,
 } from './sync-engine';
 
-// Version
-export const VERSION = '0.3.0';
+// Version (generated from package.json)
+export { VERSION } from './version';
 
 /**
  * Initialize a new local-first database instance
