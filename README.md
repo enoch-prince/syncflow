@@ -43,6 +43,46 @@ See full documentation at [syncflow.dev](https://syncflow.dev)
 - `@syncflow/mongodb` - MongoDB adapter
 - `@syncflow/postgres` - PostgreSQL adapter
 
+## 🧰 Workspace Build
+
+This repository is a `pnpm` workspace. Run the following from the repo root:
+
+```bash
+pnpm install
+pnpm -r build
+pnpm -r clean
+```
+
+To build a single package:
+
+```bash
+cd packages/core
+pnpm run build
+```
+
+Repeat for `packages/server`, `packages/adapters/mongodb`, and `packages/adapters/postgres`.
+
+## 🚀 Publishing
+
+The root workspace is private, so each package is published independently.
+
+From a package folder:
+
+```bash
+cd packages/core
+pnpm run build
+npm publish --access public
+```
+
+Before publishing, verify the package contents and types:
+
+```bash
+cd packages/core
+pnpm run clean
+pnpm run build
+npm pack --dry-run
+```
+
 ## License
 
 MIT © SyncFlow
