@@ -17,6 +17,7 @@ export type {
 
 // Sync engine exports
 export { SyncEngine } from './sync-engine';
+import type { SyncEngine as SyncEngineType } from './sync-engine';
 export type {
   SyncOptions,
   SyncProgress,
@@ -62,7 +63,7 @@ export async function createDatabase(options: {
   }
 
   // Setup sync if server URL provided
-  let sync: SyncEngine | undefined;
+  let sync: SyncEngineType | undefined;
   if (options.serverUrl) {
     sync = new SyncEngine(db, {
       serverUrl: options.serverUrl,
