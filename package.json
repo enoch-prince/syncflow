@@ -64,7 +64,7 @@
     "build:cjs": "tsc --module commonjs --outDir dist",
     "build:esm": "tsc --module esnext --outDir dist-esm && node scripts/build-esm.js",
     "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist",
-    "version": "node scripts/update-version.js",
+    "version": "node scripts/update-version.js && git add src/version.ts",
     "prepublishOnly": "npm run build",
     "test": "echo \"Tests coming soon\"",
     "release": "npm run build && npm publish --access public"
