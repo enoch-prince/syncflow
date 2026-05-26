@@ -59,7 +59,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "clean": "rm -rf dist dist-esm",
+    "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "build": "npm run clean && npm run build:cjs && npm run build:esm && npm run build:types",
     "build:cjs": "tsc --module commonjs --outDir dist",
     "build:esm": "tsc --module esnext --outDir dist-esm && node scripts/build-esm.js",
