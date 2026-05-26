@@ -297,14 +297,16 @@ export class MongoSyncAdapter {
   }
 
   /**
-   * Compact operations (remove old synced operations)
+   * Compact operations (remove operations older than the cutoff).
+   *
+   * Note: filters by age only. The `synced` flag is a client-side concept
+   * that the server never sets, so filtering on it would match zero rows.
    */
   async compact(olderThanDays: number = 30): Promise<number> {
     const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
-    
+
     const result = await this.operations.deleteMany({
       timestamp: { $lt: cutoff },
-      synced: true,
     });
 
     console.log(`✓ Compacted ${result.deletedCount} old operations`);

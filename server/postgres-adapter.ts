@@ -435,7 +435,10 @@ export class PostgresSyncAdapter {
   }
 
   /**
-   * Compact operations (remove old synced operations)
+   * Compact operations (remove operations older than the cutoff).
+   *
+   * Note: filters by age only. The `synced` flag is a client-side concept
+   * that the server never sets, so filtering on it would match zero rows.
    */
   async compact(olderThanDays: number = 30): Promise<number> {
     const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
@@ -443,7 +446,7 @@ export class PostgresSyncAdapter {
     const result = await this.pool.query(
       `
       DELETE FROM ${this.schema}.operations
-      WHERE timestamp < $1 AND synced = TRUE
+      WHERE timestamp < $1
       `,
       [cutoff]
     );
