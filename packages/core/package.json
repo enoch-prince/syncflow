@@ -12,7 +12,7 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": ["dist", "../../LICENSE", "CHANGELOG.md", "README.md"],
   "scripts": {
     "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "build": "pnpm run build:cjs && pnpm run build:esm",
