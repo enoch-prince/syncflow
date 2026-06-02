@@ -1,6 +1,6 @@
 {
   "name": "@syncflow/core",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Core client library for SyncFlow",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -12,13 +12,18 @@
       "types": "./dist/index.d.ts"
     }
   },
-  "files": ["dist", "../../LICENSE", "CHANGELOG.md", "README.md"],
+  "files": [
+    "dist",
+    "../../LICENSE",
+    "CHANGELOG.md",
+    "README.md"
+  ],
   "scripts": {
     "clean": "node -e \"['dist','dist-esm'].forEach(d=>require('fs').rmSync(d,{recursive:true,force:true}))\"",
     "build": "pnpm run build:cjs && pnpm run build:esm",
     "build:cjs": "tsc --project tsconfig.json --module commonjs --moduleResolution node --outDir dist",
     "build:esm": "tsc --project tsconfig.json --module Node16 --moduleResolution node16 --outDir dist-esm && node ../../scripts/build-esm.js dist-esm dist",
-    "version": "node ../../scripts/update-version.js . && git add src/version.ts",
+    "version:ctm": "node ../../scripts/update-version.js . && git add src/version.ts",
     "test": "echo \"Tests coming soon\""
   },
   "dependencies": {
