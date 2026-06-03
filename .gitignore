@@ -124,3 +124,8 @@ $RECYCLE.BIN/
 *.bak
 *.tmp
 .history/
+
+PUBLISHING.md
+PUBLISHING_GUIDE.md
+PYTHON_PORT.md
+PYTHON_ROADMAP.md
