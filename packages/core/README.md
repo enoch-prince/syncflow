@@ -1,12 +1,12 @@
-# @syncflow/core
+# @syncflow-db/core
 
 > Local-first database with event sourcing and vector clock synchronization
 
-[![npm version](https://img.shields.io/npm/v/@syncflow/core.svg)](https://www.npmjs.com/package/@syncflow/core)
+[![npm version](https://img.shields.io/npm/v/@syncflow-db/core.svg)](https://www.npmjs.com/package/@syncflow-db/core)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)](https://www.typescriptlang.org/)
 
-A lightweight, type-safe client library for building offline-first applications with automatic synchronization. @syncflow/core provides event sourcing, vector clock conflict detection, and seamless cloud sync.
+A lightweight, type-safe client library for building offline-first applications with automatic synchronization. @syncflow-db/core provides event sourcing, vector clock conflict detection, and seamless cloud sync.
 
 ## Features
 
@@ -21,23 +21,23 @@ A lightweight, type-safe client library for building offline-first applications 
 ## Installation
 
 ```bash
-npm install @syncflow/core wa-sqlite
+npm install @syncflow-db/core wa-sqlite
 ```
 
 Or with pnpm:
 
 ```bash
-pnpm add @syncflow/core wa-sqlite
+pnpm add @syncflow-db/core wa-sqlite
 ```
 
-`wa-sqlite` is optional—@syncflow/core will fall back to in-memory storage if not installed.
+`wa-sqlite` is optional—@syncflow-db/core will fall back to in-memory storage if not installed.
 
 ## Quick Start
 
 ### Basic Usage
 
 ```typescript
-import { createDatabase } from '@syncflow/core';
+import { createDatabase } from '@syncflow-db/core';
 
 // Initialize a local database
 const { db } = await createDatabase({
@@ -66,7 +66,7 @@ await db.delete('todos', 'doc-id');
 ### With Server Sync
 
 ```typescript
-import { createDatabase } from '@syncflow/core';
+import { createDatabase } from '@syncflow-db/core';
 
 const { db, sync } = await createDatabase({
   name: 'my-app',
@@ -237,13 +237,13 @@ import type {
   SyncProgress,       // Sync progress info
   SyncResult,         // Sync completion result
   ClockRelation,      // Vector clock comparison result
-} from '@syncflow/core';
+} from '@syncflow-db/core';
 ```
 
 ### Vector Clock Comparison
 
 ```typescript
-import { compareVectorClocks } from '@syncflow/core';
+import { compareVectorClocks } from '@syncflow-db/core';
 
 const result = compareVectorClocks(clock1, clock2);
 // 'happens-before' | 'happens-after' | 'concurrent'
@@ -275,7 +275,7 @@ This enables:
 
 ## Offline Support
 
-@syncflow/core works entirely offline:
+@syncflow-db/core works entirely offline:
 
 1. **Local Persistence** - All data stored locally via SQLite (wa-sqlite)
 2. **Operation Buffering** - Changes queued automatically for sync
@@ -295,8 +295,8 @@ await db.insert('todos', { title: 'Offline entry' });
 
 ```typescript
 import { useEffect, useState } from 'react';
-import { createDatabase } from '@syncflow/core';
-import type { Document } from '@syncflow/core';
+import { createDatabase } from '@syncflow-db/core';
+import type { Document } from '@syncflow-db/core';
 
 export function useSyncFlow(dbName: string) {
   const [docs, setDocs] = useState<Document[]>([]);
@@ -353,7 +353,7 @@ await db.batch([
 
 ## Server Implementation
 
-@syncflow/core is designed to work with @syncflow/server. See the [main repository](https://github.com/enoch-prince/syncflow) for server setup and integration examples.
+@syncflow-db/core is designed to work with @syncflow-db/server. See the [main repository](https://github.com/enoch-prince/syncflow) for server setup and integration examples.
 
 ## Performance
 

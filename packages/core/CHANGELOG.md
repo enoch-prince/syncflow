@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to @syncflow/core will be documented in this file.
+All notable changes to @syncflow-db/core will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2025-02-15
 
 ### Added
-- Initial release of @syncflow/core
+- Initial release of @syncflow-db/core
 - **LocalFirstDB**: Core database class for local data persistence
 - **Document Operations**: Insert, update, delete, and batch operations
 - **Collection Support**: Organize documents across named collections
@@ -74,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Add sync server support:
 
 ```typescript
-import { createDatabase } from '@syncflow/core';
+import { createDatabase } from '@syncflow-db/core';
 
 const { db, sync } = await createDatabase({
   name: 'my-app',
