@@ -1,5 +1,5 @@
 {
-  "name": "@syncflow/postgres",
+  "name": "@syncflow-db/postgres",
   "version": "0.3.1",
   "description": "PostgreSQL adapter for SyncFlow",
   "main": "dist/index.js",
@@ -22,6 +22,6 @@
   },
   "dependencies": {
     "pg": "^8.11.3",
-    "@syncflow/core": "workspace:^"
+    "@syncflow-db/core": "workspace:^"
   }
 }

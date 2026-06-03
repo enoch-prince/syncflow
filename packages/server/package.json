@@ -1,5 +1,5 @@
 {
-  "name": "@syncflow/server",
+  "name": "@syncflow-db/server",
   "version": "0.3.1",
   "description": "SyncFlow server package",
   "main": "dist/index.js",
@@ -23,22 +23,22 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "@syncflow/core": "workspace:^"
+    "@syncflow-db/core": "workspace:^"
   },
   "peerDependencies": {
-    "@syncflow/mongodb": "*",
-    "@syncflow/postgres": "*"
+    "@syncflow-db/mongodb": "*",
+    "@syncflow-db/postgres": "*"
   },
   "peerDependenciesMeta": {
-    "@syncflow/mongodb": {
+    "@syncflow-db/mongodb": {
       "optional": true
     },
-    "@syncflow/postgres": {
+    "@syncflow-db/postgres": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@syncflow/mongodb": "workspace:^",
-    "@syncflow/postgres": "workspace:^"
+    "@syncflow-db/mongodb": "workspace:^",
+    "@syncflow-db/postgres": "workspace:^"
   }
 }
