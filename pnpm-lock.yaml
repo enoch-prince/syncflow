@@ -29,7 +29,7 @@ importers:
 
   packages/adapters/mongodb:
     dependencies:
-      '@syncflow/core':
+      '@syncflow-db/core':
         specifier: workspace:^
         version: link:../../core
       mongodb:
@@ -38,7 +38,7 @@ importers:
 
   packages/adapters/postgres:
     dependencies:
-      '@syncflow/core':
+      '@syncflow-db/core':
         specifier: workspace:^
         version: link:../../core
       pg:
@@ -56,7 +56,7 @@ importers:
 
   packages/server:
     dependencies:
-      '@syncflow/core':
+      '@syncflow-db/core':
         specifier: workspace:^
         version: link:../core
       cors:
@@ -66,10 +66,10 @@ importers:
         specifier: ^4.18.2
         version: 4.22.2
     devDependencies:
-      '@syncflow/mongodb':
+      '@syncflow-db/mongodb':
         specifier: workspace:^
         version: link:../adapters/mongodb
-      '@syncflow/postgres':
+      '@syncflow-db/postgres':
         specifier: workspace:^
         version: link:../adapters/postgres
 
