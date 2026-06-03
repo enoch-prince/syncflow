@@ -1,5 +1,5 @@
 {
-  "name": "@syncflow/core",
+  "name": "@syncflow-db/core",
   "version": "0.3.3",
   "description": "Core client library for SyncFlow",
   "author": "Enoch Prince <princealva11@gmail.com>",
